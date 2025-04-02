@@ -12,6 +12,8 @@ class PacketSnifferApp:
 
         self.start_button = tk.Button(root, text="Start Sniffing", command=self.start_sniffing)
         self.start_button.pack()
+        self.stop_button = tk.Button(root, text="Stop Sniffing", command=self.stop_snigging)
+        self.stop_button.pack()
 
     def packet_callback(self, packet):
         if IP in packet:
@@ -33,6 +35,8 @@ class PacketSnifferApp:
 
     def start_sniffing(self):
         sniff(prn=self.packet_callback, count=100)
+    def stop_sniffing(self):
+        # TODO
 
 if __name__ == "__main__":
     root = tk.Tk()
