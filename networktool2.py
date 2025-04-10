@@ -27,19 +27,16 @@ class PacketSnifferApp:
             if TCP in packet:
                 tcp_sport = packet[TCP].sport
                 tcp_dport = packet[TCP].dport
-                msg = f"{timestamp} | IP {ip_src} -> {ip_dst} | TCP {tcp_sport} -> {tcp_dport}\n")
+                self.text.insert(tk.END, f"{timestamp} | IP {ip_src} -> {ip_dst} | TCP {tcp_sport} -> {tcp_dport}\n")
             elif UDP in packet:
                 udp_sport = packet[UDP].sport
                 udp_dport = packet[UDP].dport
-                msg = f"{timestamp} | IP {ip_src} -> {ip_dst} | UDP {udp_sport} -> {udp_dport}\n")
+                self.text.insert(tk.END, = f"{timestamp} | IP {ip_src} -> {ip_dst} | UDP {udp_sport} -> {udp_dport}\n")
             elif ICMP in packet:
                 icmp_type = packet[ICMP].type
                 icmp_code = packet[ICMP].code
-                msg = f"{timestamp} | IP {ip_src} -> {ip_dst} | ICMP Type {icmp_type} Code {icmp_code}\n")
-            else:
-                return
-            self.text.insert(tk.END, msg)
-            self.text.see(tk.END) 
+                self.text.insert(tk.END, = f"{timestamp} | IP {ip_src} -> {ip_dst} | ICMP Type {icmp_type} Code {icmp_code}\n")
+            self.text.see(tk.END)
 
     def sniff_packets(self):
         sniff(prn=self.packet_callback, stop_filter=lambda x: not self.sniffing)
@@ -54,7 +51,7 @@ class PacketSnifferApp:
     def stop_sniffing(self):
         if self.sniffing:
             self.sniffing = False
-            self.text.insert(tk.END, "Sniffing stopped. \n")
+            self.text.insert(tk.END, "Sniffing stopped...(wait for next packet)\n")
 
 if __name__ == "__main__":
     root = tk.Tk()
