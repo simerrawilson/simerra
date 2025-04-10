@@ -1,6 +1,7 @@
 import tkinter as tk
 from scapy.all import sniff, IP, TCP, UDP, ICMP
 import time
+import threading
 
 class PacketSnifferApp:
     def __init__(self, root):
@@ -12,9 +13,12 @@ class PacketSnifferApp:
 
         self.start_button = tk.Button(root, text="Start Sniffing", command=self.start_sniffing)
         self.start_button.pack()
-        self.stop_button = tk.Button(root, text="Stop Sniffing", command=self.stop_snigging)
+        self.stop_button = tk.Button(root, text="Stop Sniffing", command=self.stop_sniffing)
         self.stop_button.pack()
 
+        self.sniffing = False
+        self.sniff_thread = None
+        
     def packet_callback(self, packet):
         if IP in packet:
             ip_src = packet[IP].src
@@ -23,20 +27,34 @@ class PacketSnifferApp:
             if TCP in packet:
                 tcp_sport = packet[TCP].sport
                 tcp_dport = packet[TCP].dport
-                self.text.insert(tk.END, f"{timestamp} | IP {ip_src} -> {ip_dst} | TCP {tcp_sport} -> {tcp_dport}\n")
+                msg = f"{timestamp} | IP {ip_src} -> {ip_dst} | TCP {tcp_sport} -> {tcp_dport}\n")
             elif UDP in packet:
                 udp_sport = packet[UDP].sport
                 udp_dport = packet[UDP].dport
-                self.text.insert(tk.END, f"{timestamp} | IP {ip_src} -> {ip_dst} | UDP {udp_sport} -> {udp_dport}\n")
+                msg = f"{timestamp} | IP {ip_src} -> {ip_dst} | UDP {udp_sport} -> {udp_dport}\n")
             elif ICMP in packet:
                 icmp_type = packet[ICMP].type
                 icmp_code = packet[ICMP].code
-                self.text.insert(tk.END, f"{timestamp} | IP {ip_src} -> {ip_dst} | ICMP Type {icmp_type} Code {icmp_code}\n")
+                msg = f"{timestamp} | IP {ip_src} -> {ip_dst} | ICMP Type {icmp_type} Code {icmp_code}\n")
+            else:
+                return
+            self.text.insert(tk.END, msg)
+            self.text.see(tk.END) 
 
+    def sniff_packets(self):
+        sniff(prn=self.packet_callback, stop_filter=lambda x: not self.sniffing)
+            
     def start_sniffing(self):
-        sniff(prn=self.packet_callback, count=100)
+        if not self.sniffing:
+            self.sniffing = True
+            self.sniff_thread = threading.Thread(target=self.sniff_packets, daemon=True)
+            self.sniff_thread.start()
+            self.text.insert(tk.END, "Sniffing started...\n")
+            
     def stop_sniffing(self):
-        # TODO
+        if self.sniffing:
+            self.sniffing = False
+            self.text.insert(tk.END, "Sniffing stopped. \n")
 
 if __name__ == "__main__":
     root = tk.Tk()
