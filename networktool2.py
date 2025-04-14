@@ -31,11 +31,11 @@ class PacketSnifferApp:
             elif UDP in packet:
                 udp_sport = packet[UDP].sport
                 udp_dport = packet[UDP].dport
-                self.text.insert(tk.END, = f"{timestamp} | IP {ip_src} -> {ip_dst} | UDP {udp_sport} -> {udp_dport}\n")
+                self.text.insert(tk.END, f"{timestamp} | IP {ip_src} -> {ip_dst} | UDP {udp_sport} -> {udp_dport}\n")
             elif ICMP in packet:
                 icmp_type = packet[ICMP].type
                 icmp_code = packet[ICMP].code
-                self.text.insert(tk.END, = f"{timestamp} | IP {ip_src} -> {ip_dst} | ICMP Type {icmp_type} Code {icmp_code}\n")
+                self.text.insert(tk.END, f"{timestamp} | IP {ip_src} -> {ip_dst} | ICMP Type {icmp_type} Code {icmp_code}\n")
             self.text.see(tk.END)
 
     def sniff_packets(self):
